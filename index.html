@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gara Tramezzini</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 10px;
+}
+
+.stars span {
+  font-size: 25px;
+  cursor: pointer;
+  color: gray;
+}
+
+.stars span.active {
+  color: gold;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  background: gold;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🥪 Gara Tramezzini</h1>
+
+<input id="user" placeholder="Nome" style="padding:10px;">
+<button onclick="start()">Entra</button>
+
+<div id="app"></div>
+
+</div>
+
+<script>
+const tramezzini = ["Tonno", "Prosciutto", "Vegetariano"];
+const categorie = ["Estetica", "Bontà", "Ingredienti"];
+
+let user = "";
+
+function start() {
+  user = document.getElementById("user").value;
+  if (!user) return alert("Inserisci nome");
+
+  render();
+}
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  tramezzini.forEach(t => {
+    let html = `<div class="card"><h2>${t}</h2>`;
+
+    categorie.forEach(c => {
+      html += `<div>${c}: <div class="stars">`;
+
+      for (let i = 1; i <= 5; i++) {
+        html += `<span onclick="vote('${t}','${c}',${i}, this)">★</span>`;
+      }
+
+      html += "</div></div>";
+    });
+
+    html += "</div>";
+    app.innerHTML += html;
+  });
+
+  app.innerHTML += `<button onclick="classifica()">Mostra Classifica</button>`;
+  app.innerHTML += `<div id="risultati"></div>`;
+}
+
+function vote(t, c, v, el) {
+  let stars = el.parentNode.children;
+
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].classList.remove("active");
+  }
+
+  for (let i = 0; i < v; i++) {
+    stars[i].classList.add("active");
+  }
+
+  localStorage.setItem(`${user}-${t}-${c}`, v);
+}
+
+function classifica() {
+  let risultati = {};
+
+  tramezzini.forEach(t => {
+    let somma = 0;
+    let count = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+      let key = localStorage.key(i);
+      if (key.includes(`-${t}-`)) {
+        somma += parseInt(localStorage.getItem(key));
+        count++;
+      }
+    }
+
+    risultati[t] = count ? (somma / count) : 0;
+  });
+
+  let sorted = Object.entries(risultati).sort((a,b) => b[1]-a[1]);
+
+  let html = "<h2>🏆 Classifica</h2>";
+  sorted.forEach((r,i) => {
+    html += `<p>${i+1}. ${r[0]} - ${r[1].toFixed(2)}</p>`;
+  });
+
+  document.getElementById("risultati").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
