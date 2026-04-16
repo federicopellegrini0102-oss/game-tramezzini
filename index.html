@@ -1,145 +1,580 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Gara Tramezzini</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gara Tramezzini</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #1a1f29;
+      --panel-2: #222938;
+      --text: #f5f7fb;
+      --muted: #aeb7c6;
+      --accent: #f5c542;
+      --accent-2: #ffdf7a;
+      --danger: #d9534f;
+      --ok: #2fbf71;
+      --border: #313a4d;
+    }
 
-<style>
-body {
-  font-family: Arial;
-  background: #111;
-  color: white;
-  text-align: center;
-}
+    * { box-sizing: border-box; }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b0d12 0%, #141923 100%);
+      color: var(--text);
+    }
 
-.card {
-  background: #1e1e1e;
-  padding: 20px;
-  margin: 20px 0;
-  border-radius: 10px;
-}
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
 
-.stars span {
-  font-size: 25px;
-  cursor: pointer;
-  color: gray;
-}
+    h1, h2, h3 {
+      margin-top: 0;
+    }
 
-.stars span.active {
-  color: gold;
-}
+    .hero {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
 
-button {
-  padding: 10px 20px;
-  margin-top: 10px;
-  background: gold;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-}
-</style>
+    .hero p {
+      color: var(--muted);
+      margin-bottom: 0;
+    }
 
-</head>
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
 
-<body>
-
-<div class="container">
-
-<h1>🥪 Gara Tramezzini</h1>
-
-<input id="user" placeholder="Nome" style="padding:10px;">
-<button onclick="start()">Entra</button>
-
-<div id="app"></div>
-
-</div>
-
-<script>
-const tramezzini = ["Tonno", "Prosciutto", "Vegetariano"];
-const categorie = ["Estetica", "Bontà", "Ingredienti"];
-
-let user = "";
-
-function start() {
-  user = document.getElementById("user").value;
-  if (!user) return alert("Inserisci nome");
-
-  render();
-}
-
-function render() {
-  const app = document.getElementById("app");
-  app.innerHTML = "";
-
-  tramezzini.forEach(t => {
-    let html = `<div class="card"><h2>${t}</h2>`;
-
-    categorie.forEach(c => {
-      html += `<div>${c}: <div class="stars">`;
-
-      for (let i = 1; i <= 5; i++) {
-        html += `<span onclick="vote('${t}','${c}',${i}, this)">★</span>`;
-      }
-
-      html += "</div></div>";
-    });
-
-    html += "</div>";
-    app.innerHTML += html;
-  });
-
-  app.innerHTML += `<button onclick="classifica()">Mostra Classifica</button>`;
-  app.innerHTML += `<div id="risultati"></div>`;
-}
-
-function vote(t, c, v, el) {
-  let stars = el.parentNode.children;
-
-  for (let i = 0; i < stars.length; i++) {
-    stars[i].classList.remove("active");
-  }
-
-  for (let i = 0; i < v; i++) {
-    stars[i].classList.add("active");
-  }
-
-  localStorage.setItem(`${user}-${t}-${c}`, v);
-}
-
-function classifica() {
-  let risultati = {};
-
-  tramezzini.forEach(t => {
-    let somma = 0;
-    let count = 0;
-
-    for (let i = 0; i < localStorage.length; i++) {
-      let key = localStorage.key(i);
-      if (key.includes(`-${t}-`)) {
-        somma += parseInt(localStorage.getItem(key));
-        count++;
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
     }
 
-    risultati[t] = count ? (somma / count) : 0;
-  });
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+    }
 
-  let sorted = Object.entries(risultati).sort((a,b) => b[1]-a[1]);
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
 
-  let html = "<h2>🏆 Classifica</h2>";
-  sorted.forEach((r,i) => {
-    html += `<p>${i+1}. ${r[0]} - ${r[1].toFixed(2)}</p>`;
-  });
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 14px;
+    }
 
-  document.getElementById("risultati").innerHTML = html;
-}
-</script>
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
 
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #111;
+    }
+
+    .btn-secondary {
+      background: #2e3748;
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--ok);
+      color: white;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .row > * {
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(245,197,66,0.15);
+      color: var(--accent-2);
+      border: 1px solid rgba(245,197,66,0.25);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tramezzino-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .ingredienti {
+      color: #d9dfeb;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .vote-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .vote-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stars {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .star {
+      font-size: 28px;
+      color: #5e6572;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.15s ease;
+    }
+
+    .star.active {
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(245,197,66,0.25);
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .ranking-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ranking-right {
+      text-align: right;
+      min-width: 120px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .section-title {
+      margin-bottom: 14px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="badge">Gara Tramezzini</div>
+      <h1>Classifica tramezzini</h1>
+      <p>
+        Inserisci i tramezzini portati dai partecipanti, votali per categoria da 0 a 5 stelle
+        e genera la classifica finale.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2 class="section-title">Impostazioni gara</h2>
+
+        <label for="judgeName">Nome votante</label>
+        <input id="judgeName" type="text" placeholder="Es. Federico" />
+
+        <div class="divider"></div>
+
+        <h3>Aggiungi un tramezzino</h3>
+
+        <label for="sandwichName">Nome tramezzino</label>
+        <input id="sandwichName" type="text" placeholder="Es. Tonno e carciofini" />
+
+        <label for="ownerName">Portato da</label>
+        <input id="ownerName" type="text" placeholder="Es. Marco" />
+
+        <label for="ingredients">Ingredienti / note</label>
+        <textarea id="ingredients" placeholder="Es. pane integrale, tonno, carciofini, maionese leggera"></textarea>
+
+        <button class="btn-primary" onclick="addSandwich()">Aggiungi tramezzino</button>
+
+        <div class="divider"></div>
+
+        <h3>Azioni</h3>
+        <div class="top-actions">
+          <button class="btn-success" onclick="renderRanking()">Genera classifica</button>
+          <button class="btn-secondary" onclick="seedExample()">Carica esempio</button>
+          <button class="btn-danger" onclick="resetAll()">Reset totale</button>
+        </div>
+
+        <p class="small" style="margin-top:16px;">
+          Nota: questa versione salva i dati nel browser del dispositivo. Non sincronizza più persone tra telefoni o PC diversi.
+        </p>
+      </div>
+
+      <div>
+        <div class="panel" style="margin-bottom:20px;">
+          <h2 class="section-title">Tramezzini in gara</h2>
+          <div id="sandwichList"></div>
+        </div>
+
+        <div class="panel">
+          <h2 class="section-title">Classifica finale</h2>
+          <div id="ranking"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      "Bontà generale",
+      "Estetica / presentazione",
+      "Qualità ingredienti",
+      "Originalità",
+      "Equilibrio dei sapori"
+    ];
+
+    function getSandwiches() {
+      return JSON.parse(localStorage.getItem("sandwiches") || "[]");
+    }
+
+    function saveSandwiches(data) {
+      localStorage.setItem("sandwiches", JSON.stringify(data));
+    }
+
+    function getVotes() {
+      return JSON.parse(localStorage.getItem("votes") || "{}");
+    }
+
+    function saveVotes(votes) {
+      localStorage.setItem("votes", JSON.stringify(votes));
+    }
+
+    function uid() {
+      return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
+    function addSandwich() {
+      const name = document.getElementById("sandwichName").value.trim();
+      const owner = document.getElementById("ownerName").value.trim();
+      const ingredients = document.getElementById("ingredients").value.trim();
+
+      if (!name) {
+        alert("Inserisci il nome del tramezzino.");
+        return;
+      }
+
+      if (!owner) {
+        alert("Inserisci chi ha portato il tramezzino.");
+        return;
+      }
+
+      const sandwiches = getSandwiches();
+      sandwiches.push({
+        id: uid(),
+        name,
+        owner,
+        ingredients
+      });
+
+      saveSandwiches(sandwiches);
+
+      document.getElementById("sandwichName").value = "";
+      document.getElementById("ownerName").value = "";
+      document.getElementById("ingredients").value = "";
+
+      renderSandwiches();
+      renderRanking();
+    }
+
+    function removeSandwich(id) {
+      if (!confirm("Vuoi eliminare questo tramezzino?")) return;
+
+      const sandwiches = getSandwiches().filter(s => s.id !== id);
+      saveSandwiches(sandwiches);
+
+      const votes = getVotes();
+      Object.keys(votes).forEach(key => {
+        if (key.startsWith(id + "::")) {
+          delete votes[key];
+        }
+      });
+      saveVotes(votes);
+
+      renderSandwiches();
+      renderRanking();
+    }
+
+    function setVote(sandwichId, category, value) {
+      const judge = document.getElementById("judgeName").value.trim();
+
+      if (!judge) {
+        alert("Inserisci prima il nome del votante.");
+        return;
+      }
+
+      const votes = getVotes();
+      const key = `${sandwichId}::${judge}::${category}`;
+      votes[key] = value;
+      saveVotes(votes);
+
+      renderSandwiches();
+      renderRanking();
+    }
+
+    function getVoteValue(sandwichId, category) {
+      const judge = document.getElementById("judgeName").value.trim();
+      if (!judge) return -1;
+
+      const votes = getVotes();
+      const key = `${sandwichId}::${judge}::${category}`;
+      return typeof votes[key] === "number" ? votes[key] : -1;
+    }
+
+    function createStars(sandwichId, category) {
+      const selected = getVoteValue(sandwichId, category);
+      let html = `<div class="stars">`;
+
+      for (let i = 0; i <= 5; i++) {
+        const active = selected >= i && selected !== -1 ? "active" : "";
+        html += `<span class="star ${active}" onclick="setVote('${sandwichId}', '${category.replace(/'/g, "\\'")}', ${i})">★</span>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    function renderSandwiches() {
+      const box = document.getElementById("sandwichList");
+      const sandwiches = getSandwiches();
+
+      if (!sandwiches.length) {
+        box.innerHTML = `<p class="empty">Nessun tramezzino ancora inserito.</p>`;
+        return;
+      }
+
+      box.innerHTML = sandwiches.map(s => `
+        <div class="tramezzino-card">
+          <div class="row" style="justify-content:space-between; align-items:flex-start;">
+            <div style="flex:1;">
+              <h3>${escapeHtml(s.name)}</h3>
+              <div class="meta">Portato da: <strong>${escapeHtml(s.owner)}</strong></div>
+              <div class="ingredienti">${s.ingredients ? escapeHtml(s.ingredients) : '<span class="small">Nessuna nota ingredienti</span>'}</div>
+            </div>
+            <div style="flex:0;">
+              <button class="btn-danger" onclick="removeSandwich('${s.id}')">Elimina</button>
+            </div>
+          </div>
+
+          ${categories.map(cat => `
+            <div class="vote-row">
+              <div>${cat}</div>
+              <div>${createStars(s.id, cat)}</div>
+            </div>
+          `).join("")}
+        </div>
+      `).join("");
+    }
+
+    function renderRanking() {
+      const rankingBox = document.getElementById("ranking");
+      const sandwiches = getSandwiches();
+      const votes = getVotes();
+
+      if (!sandwiches.length) {
+        rankingBox.innerHTML = `<p class="empty">Aggiungi almeno un tramezzino per vedere la classifica.</p>`;
+        return;
+      }
+
+      const ranking = sandwiches.map(s => {
+        let total = 0;
+        let count = 0;
+        const categoryAverages = {};
+
+        categories.forEach(cat => {
+          const values = [];
+
+          Object.entries(votes).forEach(([key, value]) => {
+            const [sandwichId, judge, category] = key.split("::");
+            if (sandwichId === s.id && category === cat) {
+              values.push(value);
+            }
+          });
+
+          const avg = values.length
+            ? values.reduce((a, b) => a + b, 0) / values.length
+            : 0;
+
+          categoryAverages[cat] = avg;
+
+          total += values.reduce((a, b) => a + b, 0);
+          count += values.length;
+        });
+
+        return {
+          ...s,
+          overall: count ? total / count : 0,
+          votesCount: count,
+          categoryAverages
+        };
+      });
+
+      ranking.sort((a, b) => b.overall - a.overall);
+
+      rankingBox.innerHTML = ranking.map((item, index) => `
+        <div class="ranking-item">
+          <div class="ranking-left">
+            <strong>${index + 1}. ${escapeHtml(item.name)}</strong>
+            <span class="small">Portato da ${escapeHtml(item.owner)}</span>
+            <span class="small">Voti registrati: ${item.votesCount}</span>
+            <span class="small">
+              ${categories.map(cat => `${cat}: ${item.categoryAverages[cat].toFixed(2)}`).join(" | ")}
+            </span>
+          </div>
+          <div class="ranking-right">
+            <strong style="font-size: 24px;">${item.overall.toFixed(2)}</strong>
+            <div class="small">media finale</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function seedExample() {
+      const sandwiches = [
+        {
+          id: uid(),
+          name: "Tonno deluxe",
+          owner: "Marco",
+          ingredients: "Tonno, capperi, maionese, pane al latte"
+        },
+        {
+          id: uid(),
+          name: "Vegetariano croccante",
+          owner: "Luca",
+          ingredients: "Zucchine grigliate, hummus, pomodoro secco"
+        },
+        {
+          id: uid(),
+          name: "Prosciutto e crema tartufata",
+          owner: "Giulia",
+          ingredients: "Prosciutto cotto, crema al tartufo, lattuga"
+        }
+      ];
+
+      saveSandwiches(sandwiches);
+      saveVotes({});
+      renderSandwiches();
+      renderRanking();
+    }
+
+    function resetAll() {
+      const ok = confirm("Vuoi cancellare tutti i tramezzini e tutti i voti?");
+      if (!ok) return;
+
+      localStorage.removeItem("sandwiches");
+      localStorage.removeItem("votes");
+      renderSandwiches();
+      renderRanking();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    renderSandwiches();
+    renderRanking();
+  </script>
 </body>
 </html>
